@@ -13,23 +13,44 @@ class Genetic:
         self.population = []
         self.fitness = []
         for _ in range(self.num_pop):
-            species = np.zeros(self.num_states + self.num_inputs)
+            individual = np.zeros(self.num_states + self.num_inputs)
             for j in range(self.num_states + self.num_inputs):
-                species[j] = log10uniform(-2, 3)
-            self.population.append(species)
+                individual[j] = log10uniform(-5, 5)
+            self.population.append(individual)
 
-    def roulette(self, fitness):
+    def roulette(self, fitness_sorted, offset=0.1):
         ## Roulette selection of parents ##
-        parent1 = fitness[0][0]
-        parent2 = fitness[1][0]
+        # Fitness normalization
+        fitness_roulette = []
+        lowest_fitness = fitness_sorted[-1][1]
+        fitness_sum = 0
+        for i in range(self.num_pop):
+            fitness_roulette.append(fitness_sorted[i][1] - lowest_fitness + offset)
+            fitness_sum += fitness_sorted[i][1] - lowest_fitness + offset
+            
+        for i in range(self.num_pop):
+            fitness_roulette[i] /= fitness_sum
+
+        fitness_roulette = np.cumsum(fitness_roulette)      
+        r1 = np.random.random()
+        r2 = np.random.random()
+        for ind, probability in enumerate(fitness_roulette):
+            if probability > r1:
+                parent1 = fitness_sorted[ind][0]
+                break
+
+        for ind, probability in enumerate(fitness_roulette):
+            if probability > r2:
+                parent2 = fitness_sorted[ind][0]
+                break
         
         return parent1, parent2
     
     def crossover(self, parent1, parent2):
         ## Single point crossover ##
-        point = np.random.randint(0, self.num_states+self.num_inputs)
-        child1 = parent1
-        child2 = parent2
+        point = np.random.randint(1, self.num_states+self.num_inputs-1)
+        child1 = np.concatenate((parent1[0:point], parent2[point:]))
+        child2 = np.concatenate((parent2[0:point], parent1[point:]))
         
         return child1, child2
 
@@ -41,8 +62,10 @@ class Genetic:
 
     def next_gen(self):
         self.offsprings = []
-        self.fitness.sort(key=lambda tup: tup[1], reverse=True)
-        parent1, parent2 = self.roulette(self.fitness)
+        self.population = []
+        self.fitness_sorted = sorted(self.fitness, key=lambda tup: tup[1], reverse=True)
+
+        parent1, parent2 = self.roulette(self.fitness_sorted)
 
         for _ in range(self.num_offspring):
             child1, child2 = self.crossover(parent1, parent2)
@@ -52,11 +75,15 @@ class Genetic:
                 self.offsprings.append(child1)
             if len(self.offsprings) < self.num_offspring:
                 self.offsprings.append(child2)
- 
-        self.population = self.fitness[0:self.num_pop-self.num_offspring]
+
+        for i in range(self.num_pop-self.num_offspring):
+            self.population.append(self.fitness_sorted[i][0])
 
         for offspring in self.offsprings:
             self.population.append(offspring)
+
+        self.fitness = []
+
 
 
         

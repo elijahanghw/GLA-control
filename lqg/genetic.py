@@ -31,7 +31,9 @@ class Genetic:
         for i in range(self.num_pop):
             fitness_roulette[i] /= fitness_sum
 
-        fitness_roulette = np.cumsum(fitness_roulette)      
+        fitness_roulette = np.cumsum(fitness_roulette) 
+        print(fitness_sorted)     
+        print(fitness_roulette)     
         r1 = np.random.random()
         r2 = np.random.random()
         for ind, probability in enumerate(fitness_roulette):
@@ -83,7 +85,4 @@ class Genetic:
             self.population.append(offspring)
 
         self.fitness = []
-
-
-
         

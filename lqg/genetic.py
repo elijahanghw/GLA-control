@@ -3,7 +3,7 @@ import numpy as np
 from utils import *
 
 class Genetic:
-    def __init__(self, num_states, num_inputs, num_pop=100, offsprings=0.5):
+    def __init__(self, num_states, num_inputs, num_pop=100, offsprings=0.8):
         self.num_pop = num_pop
         self.num_states = num_states
         self.num_inputs = num_inputs
@@ -11,12 +11,12 @@ class Genetic:
 
     def initialize(self):
         self.population = []
-        self.fitness = []
-        for _ in range(self.num_pop):
+        self.fitness = [None] * self.num_pop
+        for i in range(self.num_pop):
             individual = np.zeros(self.num_states + self.num_inputs)
             for j in range(self.num_states + self.num_inputs):
                 individual[j] = log10uniform(-5, 5)
-            self.population.append(individual)
+            self.population.append(individual) 
 
     def roulette(self, fitness_sorted, offset=0.1):
         ## Roulette selection of parents ##
@@ -31,20 +31,25 @@ class Genetic:
         for i in range(self.num_pop):
             fitness_roulette[i] /= fitness_sum
 
-        fitness_roulette = np.cumsum(fitness_roulette) 
-        print(fitness_sorted)     
-        print(fitness_roulette)     
-        r1 = np.random.random()
-        r2 = np.random.random()
-        for ind, probability in enumerate(fitness_roulette):
-            if probability > r1:
-                parent1 = fitness_sorted[ind][0]
-                break
+        fitness_roulette = np.cumsum(fitness_roulette)  
+        
+        ind1 = -1
+        ind2 = -1
 
-        for ind, probability in enumerate(fitness_roulette):
-            if probability > r2:
-                parent2 = fitness_sorted[ind][0]
-                break
+        while ind1 == ind2:
+            r1 = np.random.random()
+            r2 = np.random.random()
+            for ind, probability in enumerate(fitness_roulette):
+                if probability > r1:
+                    ind1 = ind
+                    break
+
+            for ind, probability in enumerate(fitness_roulette):
+                if probability > r2:
+                    ind2 = ind
+                    break
+        parent1 = fitness_sorted[ind1][0]
+        parent2 = fitness_sorted[ind2][0]
         
         return parent1, parent2
     
@@ -57,8 +62,11 @@ class Genetic:
         return child1, child2
 
 
-    def mutate(self, child, mu=0.05, sigma=0.1):
+    def mutate(self, child, mu=0.2, sigma=0.02):
         ## Mutate genes ##
+        rm = np.random.random()
+        if mu > rm:
+            child = child * np.random.uniform(1-sigma, 1+sigma, size=child.shape)
 
         return child
 
@@ -84,5 +92,5 @@ class Genetic:
         for offspring in self.offsprings:
             self.population.append(offspring)
 
-        self.fitness = []
+        self.fitness = [None] * self.num_pop
         

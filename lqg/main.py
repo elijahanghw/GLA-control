@@ -1,4 +1,6 @@
 import numpy as np
+import multiprocessing as mp
+from multiprocessing import Pool
 import control
 import matplotlib.pyplot as plt
 import scipy.io as sio
@@ -6,6 +8,7 @@ import scipy.io as sio
 from matrices import *
 from genetic import *
 from timesim import *
+from utils import *
 
 ## Sim parameters
 num_chord = 8
@@ -29,31 +32,40 @@ sys = control.ss(A, B, C, D, dt)
 T, plunge, pitch, bend = open_time_march(A, B, C, D, timesteps, dt, H5gust)
 
 ## GE for lqr control
-generations = 20
-ga = Genetic(num_states, 3, num_pop=10)
+generations = 100
+ga = Genetic(num_states, 3, num_pop=100)
 ga.initialize()
 fitness_history = np.zeros(generations)
 
 print("Starting genetic algorithm...")
 
-for gen in range(generations):
-    for species in ga.population:
-        # Define weighing matrices from genes
-        Q = np.diag(species[:num_states])
-        R = np.diag(species[num_states:])
+if __name__ == '__main__':
+    for gen in range(generations):
+        for i, species in enumerate(ga.population):
+            # Define weighing matrices from genes
+            Q = np.diag(species[:num_states])
+            R = np.diag(species[num_states:])
 
-        # Compute gain matrix
-        K, S, E = control.lqr(sys, Q, R)
+            # Compute gain matrix
+            K, S, E = control.lqr(sys, Q, R)
+            E = np.log(E)/dt
 
-        # Simulate and compute fitness
-        T, plunge_close, pitch_close, bend_close, _, _, _ = close_time_march(A, B, C, D, K, timesteps, dt, H5gust)
+            # Simulate and compute fitness
+            T, plunge_close, pitch_close, bend_close, i1, i2, i3 = close_time_march(A, B, C, D, K, timesteps, dt, H5gust)
 
-        fitness = -np.sum(T*(plunge_close**2 + (100*pitch_close)**2 + (1000*bend_close)**2))
-        ga.fitness.append((species, fitness))
+            SI = -max(np.real(E))
+            overshoot_index = -max(abs(plunge_close)) - 100*max(abs(pitch_close)) - 5000*max(abs(bend_close))
+            
+            settling_index = -np.sum(T*(plunge_close**2 + (10*pitch_close)**2 + (200*bend_close)**2))
 
-    ga.next_gen()
-    fitness_history[gen] = ga.fitness_sorted[0][1]
-    print(f"Generation: {gen+1}       Fitness: {ga.fitness_sorted[0][1]}")
+            input_index = -max(abs(i1)) - max(abs(i2)) - max(abs(i3))
+
+            fitness = 10*SI + 10*overshoot_index + 0.1*settling_index + 30*input_index
+            ga.fitness[i] = (species, fitness)
+
+        ga.next_gen()
+        fitness_history[gen] = ga.fitness_sorted[0][1]
+        print(f"Generation: {gen+1}       Fitness: {ga.fitness_sorted[0][1]}")
 
 ## Optimal weights after GA
 optimal_individual = ga.fitness_sorted[0][0]
@@ -87,8 +99,8 @@ plt.plot(T, pitch_close/np.pi*180, '--r')
 plt.legend(("Open loop", "Close loop"))
 
 plt.figure(4)
-plt.plot(T, bend, 'k')
-plt.plot(T, bend_close, '--r')
+plt.plot(T, bend*200, 'k')
+plt.plot(T, bend_close*200, '--r')
 plt.legend(("Open loop", "Close loop"))
 
 plt.figure(5)

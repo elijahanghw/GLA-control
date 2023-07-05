@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     ## Load matrices
     A, B, C, D, T_rom, Ti_rom = system_mat()
-    H1gust, H2gust, H3gust, H5gust = gusts()
+    H5gust, H10gust, H15gust, H20gust = gusts()
     num_states = A.shape[0]
     sys = control.ss(A, B, C, D, dt)
 
@@ -53,13 +53,13 @@ if __name__ == '__main__':
             T, plunge_close, pitch_close, bend_close, i1, i2, i3 = close_time_march(A, B, C, D, K, timesteps, dt, H5gust)
 
             SI = -max(np.real(E))
-            overshoot_index = -max(abs(plunge_close)) - 100*max(abs(pitch_close)) - 5000*max(abs(bend_close))
+            overshoot_index = -max(abs(plunge_close)) - 100*max(abs(pitch_close)) - 7000*max(abs(bend_close))
                 
             settling_index = -np.sum(T*abs(plunge_close + abs(10*pitch_close) + abs(200*bend_close)))
 
             input_index = -max(abs(i1)) - max(abs(i2)) - max(abs(i3))
 
-            fitness = 5*SI + 5*overshoot_index + 0.05*settling_index + 2*input_index
+            fitness = 5*SI + 5*overshoot_index + 0.08*settling_index + 3*input_index
             ga.fitness[i] = (species, fitness)
         ga.next_gen()
         fitness_history[gen] = ga.fitness_sorted[0][1]

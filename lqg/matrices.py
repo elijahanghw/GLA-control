@@ -15,16 +15,16 @@ def system_mat():
 
 def gusts():
     T_rom = sio.loadmat('model/reduced/T_rom.mat')["T_rom"]
-    H1gust = sio.loadmat('model/discretegusts/H1gust.mat')["arr"]
-    H1gust = np.matmul(T_rom, H1gust)
-    
-    H2gust = sio.loadmat('model/discretegusts/H2gust.mat')["arr"]
-    H2gust = np.matmul(T_rom, H2gust)
-
-    H3gust = sio.loadmat('model/discretegusts/H3gust.mat')["arr"]
-    H3gust = np.matmul(T_rom, H3gust)
-    
     H5gust = sio.loadmat('model/discretegusts/H5gust.mat')["arr"]
     H5gust = np.matmul(T_rom, H5gust)
+    
+    H10gust = sio.loadmat('model/discretegusts/H10gust.mat')["arr"]
+    H10gust = np.matmul(T_rom, H10gust)
 
-    return H1gust, H2gust, H3gust, H5gust
+    H15gust = sio.loadmat('model/discretegusts/H15gust.mat')["arr"]
+    H15gust = np.matmul(T_rom, H15gust)
+    
+    H20gust = sio.loadmat('model/discretegusts/H20gust.mat')["arr"]
+    H20gust = np.matmul(T_rom, H20gust)
+
+    return H5gust, H10gust, H15gust, H20gust

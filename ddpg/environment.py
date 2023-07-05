@@ -1,4 +1,5 @@
 import scipy.io as sio
+import random
 import numpy as np
 
 class Environment:
@@ -13,9 +14,18 @@ class Environment:
 
         self.H5gust = sio.loadmat('model/discretegusts/H5gust.mat')["arr"]
         self.H5gust = np.matmul(self.T_rom, self.H5gust)
+        self.H10gust = sio.loadmat('model/discretegusts/H10gust.mat')["arr"]
+        self.H10gust = np.matmul(self.T_rom, self.H10gust)
+        self.H15gust = sio.loadmat('model/discretegusts/H15gust.mat')["arr"]
+        self.H15gust = np.matmul(self.T_rom, self.H15gust)
+        self.H20gust = sio.loadmat('model/discretegusts/H20gust.mat')["arr"]
+        self.H20gust = np.matmul(self.T_rom, self.H20gust)
+
+        self.gust_list = [self.H5gust, self.H10gust, self.H15gust, self.H20gust]
 
         # Deflection action
         self.action_space = np.array([[-20/180*np.pi, 20/180*np.pi], [-20/180*np.pi, 20/180*np.pi], [-20/180*np.pi, 20/180*np.pi]])
+        self.norm_action_space = np.array([[-1,1], [-1,1], [-1,1]])
 
         # Rate action
         # self.action_space = np.array([[-50/180*np.pi, 50/180*np.pi], [-50/180*np.pi, 50/180*np.pi], [-50/180*np.pi, 50/180*np.pi]])
@@ -25,7 +35,11 @@ class Environment:
     def reset(self):
         self.t = 0
         self.x_old = np.zeros(self.A.shape[0])
-        self.U = np.zeros(self.action_space[0])
+        self.U = np.zeros(self.action_space.shape[0])
+        # Initialise run with randomly selected gust
+        self.gust = random.choice(self.gust_list)
+
+        return np.matmul(self.C, self.x_old)
     
     def step(self, action):
         # Deflection action
@@ -35,7 +49,7 @@ class Environment:
         # self.U_dot = self.inv_norm_act(action)
         # self.U += self.U_dot
 
-        x_new = np.matmul(self.A, self.x_old) + np.matmul(self.B, self.U) + self.H5gust[:,self.t]
+        x_new = np.matmul(self.A, self.x_old) + np.matmul(self.B, self.U) + self.gust[:,self.t]
         y = np.matmul(self.C, x_new)
         plunge = y[0]
         pitch = y[1]
@@ -43,17 +57,17 @@ class Environment:
         self.x_old = x_new
         self.t += 1
 
-        new_state = (plunge, pitch, bend)
-        reward = -abs(plunge) - 10*abs(pitch) - 200*abs(bend)
+        new_state = np.array([plunge, pitch, bend])
+        reward = 0.003*(-abs(plunge) - 180/np.pi*abs(pitch) - 200*abs(bend))
         
         return new_state, reward
     
-    def norm_act(self, action):
+    def inv_norm_act(self, action):
         m = (self.action_space[:,1] - self.action_space[:,0])/2
         c = (self.action_space[:,1] + self.action_space[:,0])/2
         return m*action + c
 
-    def inv_norm_act(self, action):
+    def norm_act(self, action):
         m = 2/(self.action_space[:,1] - self.action_space[:,0])
         b = (self.action_space[:,1] + self.action_space[:,0])/2
         return m *(action - b)

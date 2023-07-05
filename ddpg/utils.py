@@ -3,7 +3,7 @@ import random
 from collections import deque
 
 class OUNoise(object):
-    def __init__(self, action_space, mu=0.0, theta=0.15, max_sigma=0.3, min_sigma=0.3, decay_period=100000):
+    def __init__(self, action_space, dt, mu=0.0, theta=0.15, max_sigma=0.1, min_sigma=0.1, decay_period=100000):
         self.mu           = mu
         self.theta        = theta
         self.sigma        = max_sigma
@@ -13,6 +13,7 @@ class OUNoise(object):
         self.action_dim   = action_space.shape[0]
         self.low          = action_space[:,0]
         self.high         = action_space[:,1]
+        self.dt = dt
         self.reset()
         
     def reset(self):
@@ -21,7 +22,7 @@ class OUNoise(object):
     def evolve_state(self):
         x  = self.state
         dx = self.theta * (self.mu - x) + self.sigma * np.random.randn(self.action_dim)
-        self.state = x + dx
+        self.state = x + dx * self.dt
         return self.state
     
     def get_action(self, action, t=0):
@@ -48,14 +49,14 @@ class Memory:
         batch = random.sample(self.buffer, batch_size)
 
         for experience in batch:
-            state, action, reward, next_state, done = experience
+            state, action, reward, next_state = experience
             state_batch.append(state)
             action_batch.append(action)
             reward_batch.append(reward)
             next_state_batch.append(next_state)
-            done_batch.append(done)
+            #done_batch.append(done)
         
-        return state_batch, action_batch, reward_batch, next_state_batch, done_batch
+        return state_batch, action_batch, reward_batch, next_state_batch #, done_batch
 
     def __len__(self):
         return len(self.buffer)

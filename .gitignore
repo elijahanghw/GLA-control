@@ -1,3 +1,8 @@
 /venv/
 /lqg/__pycache__/
 /ddpg/__pycache__/
+/pid/__pycache__/
+/lqg/figures/
+/model/contgust/figures/
+/model/discretegusts/figures/
+/balance_reduction/figures/

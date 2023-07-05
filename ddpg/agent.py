@@ -35,12 +35,18 @@ class Agent:
     def get_action(self, state):
         state = Variable(torch.from_numpy(state).float().unsqueeze(0))
         action = self.actor.forward(state)
-        action = action.detach().numpy()[0,0]
+        action = action.detach().numpy()[0]
 
         return action
         
     def update(self, batch_size):
-        states, actions, rewards, next_states, _ = self.memory.sample(batch_size)
+        states, actions, rewards, next_states = self.memory.sample(batch_size)
+
+        states = np.array(states)
+        actions = np.array(actions)
+        rewards = np.array(rewards)
+        next_states = np.array(next_states)
+
         states = torch.FloatTensor(states)
         actions = torch.FloatTensor(actions)
         rewards = torch.FloatTensor(rewards)
@@ -71,4 +77,8 @@ class Agent:
        
         for target_param, param in zip(self.critic_target.parameters(), self.critic.parameters()):
             target_param.data.copy_(param.data * self.tau + target_param.data * (1.0 - self.tau))
+
+    def save_actor_critic(self):
+        torch.save(self.actor.state_dict(), 'ddpg/actor.pth')
+        torch.save(self.critic.state_dict(), 'ddpg/critic.pth')
 

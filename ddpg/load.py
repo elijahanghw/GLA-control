@@ -23,7 +23,7 @@ timesteps = int(simulation_time/dt)
 env = Environment()
 agent = Agent(env)
 
-agent.actor.load_state_dict(torch.load("ddpg/trained_models/ddpg2_fullstate/actor.pth"))
+agent.actor.load_state_dict(torch.load("ddpg/trained_models/ddpg3/actor.pth"))
 
 state = env.reset()
 env.select_gust("H5")
@@ -36,9 +36,9 @@ input3 = []
 for step in tqdm.tqdm(range(timesteps), desc="Simulation", position=0):
     action = agent.get_action(state)
     new_state, _ = env.step(action)
-    plunge.append(outputs[0])
-    pitch.append(outputs[1])
-    bend.append(outputs[2])
+    plunge.append(new_state[0])
+    pitch.append(new_state[1])
+    bend.append(new_state[2])
     input1.append(env.U[0])
     input2.append(env.U[1])
     input3.append(env.U[2])

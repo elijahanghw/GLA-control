@@ -17,7 +17,7 @@ V_inf = 10
 ds = 1/num_chord
 dt = ds*ref_chord/V_inf
 
-simulation_time = 5
+simulation_time = 4
 timesteps = int(simulation_time/dt)
 
 env = Environment()
@@ -25,11 +25,11 @@ env = Environment()
 agent = Agent(env)
 noise = OUNoise(env.norm_action_space, dt)
 
-batch_size = 256
+batch_size = 32
 rewards = []
 avg_rewards = []
 
-num_episodes = 1000
+num_episodes = 500
 for episode in tqdm.tqdm(range(num_episodes), desc='Episode', position=0):
     start_time = time.time()
     state = env.reset()
@@ -40,7 +40,10 @@ for episode in tqdm.tqdm(range(num_episodes), desc='Episode', position=0):
         action = agent.get_action(state)
         action = noise.get_action(action, step)
         new_state, reward = env.step(action)
-        agent.memory.push(state, action, reward, new_state)
+        done = 1
+        if step == timesteps-1:
+            done = 0
+        agent.memory.push(state, action, reward, new_state, done)
         state = new_state
 
         if len(agent.memory) > batch_size:
@@ -49,8 +52,8 @@ for episode in tqdm.tqdm(range(num_episodes), desc='Episode', position=0):
         episode_reward += reward
         
     rewards.append(episode_reward/1000)
-    avg_rewards.append(np.mean(rewards[-10:]))
-    tqdm.tqdm.write(f"Episode: {episode}      Reward: {episode_reward/1000}")
+    avg_rewards.append(np.mean(rewards[-20:]))
+    tqdm.tqdm.write(f"Episode: {episode}      Reward: {episode_reward/1000}     Trailing 20 avg: {np.mean(rewards[-20:])} ")
 
 # Save model
 agent.save_actor_critic()

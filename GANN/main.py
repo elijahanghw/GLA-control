@@ -1,15 +1,15 @@
 import time
+import tqdm
 import numpy as np
-import multiprocessing as mp
 import control
 import matplotlib.pyplot as plt
 import scipy.io as sio
-from functools import partial
 
 from matrices import *
 from genetic import *
 from timesim import *
 from utils import *
+from network import *
 
 if __name__ == '__main__':
     ## Sim parameters
@@ -31,57 +31,43 @@ if __name__ == '__main__':
     ## Open loop simulation
     T, plunge, pitch, bend = open_time_march(A, B, C, D, timesteps, dt, H5gust)
 
-    ## GE for lqr control
-    generations = 1000
-    ga = Genetic(num_states, 3, num_pop=100)
+    ## GE for nn control
+    generations = 10
+    ga = Genetic(3, 3, num_pop=100)
     ga.initialize()
     fitness_history = np.zeros(generations)
 
     print("Starting genetic algorithm...")
-    for gen in range(generations):
-        start_time = time.time()
+    start_time = time.time()
+    for gen in tqdm.tqdm(range(generations), desc="Generation", position=0):
+        gen_time = time.time()
         for i, species in enumerate(ga.population):
-            # Define weighing matrices from genes
-            Q = np.diag(species[:num_states])
-            R = np.diag(species[num_states:])
-
-            # Compute gain matrix
-            K, S, E = control.lqr(sys, Q, R)
-            E = np.log(E)/dt
-
+            controller = Controller(individual=species)
+            controller.setup()
             # Simulate and compute fitness
-            T, plunge_close, pitch_close, bend_close, i1, i2, i3 = close_time_march(A, B, C, D, K, timesteps, dt, H5gust)
+            T, plunge_close, pitch_close, bend_close, i1, i2, i3 = close_time_march(A, B, C, D, controller, timesteps, dt, H5gust)
 
-            SI = -max(np.real(E))
             overshoot_index = -max(abs(plunge_close)) - 100*max(abs(pitch_close)) - 7000*max(abs(bend_close))
                 
-            settling_index = -np.sum(T*(abs(plunge_close) + abs(10*pitch_close) + abs(200*bend_close)))
+            settling_index = -np.sum(T*abs(plunge_close + abs(10*pitch_close) + abs(200*bend_close)))
 
             input_index = -max(abs(i1)) - max(abs(i2)) - max(abs(i3))
 
-            fitness = 5*SI + 5*overshoot_index + 0.08*settling_index + 3*input_index
+            fitness = 5*overshoot_index + 0.08*settling_index + 3*input_index
             ga.fitness[i] = (species, fitness)
         ga.next_gen()
         fitness_history[gen] = ga.fitness_sorted[0][1]
-        print(f"Generation: {gen+1}       Fitness: {ga.fitness_sorted[0][1]}    Time taken: {time.time() - start_time}s")
+        tqdm.tqdm.write(f"Generation: {gen+1}       Fitness: {ga.fitness_sorted[0][1]}")
             
     ## Optimal weights after GA
     optimal_individual = ga.fitness_sorted[0][0]
-    Q_optimal = np.diag(optimal_individual[:num_states])
-    R_optimal = np.diag(optimal_individual[num_states:])
-    # Compute gain matrix
-    K_optimal, S, E = control.lqr(sys, Q_optimal, R_optimal)
-
-    ## Save optimal weights and gains
-    sio.savemat("lqg/Q_optimal.mat", mdict={"Q_optimal": Q_optimal})
-    sio.savemat("lqg/R_optimal.mat", mdict={"R_optimal": R_optimal})
-    sio.savemat("lqg/K_optimal.mat", mdict={"K_optimal": K_optimal})
-
-    ## Save fitness history
-    sio.savemat("lqg/fitness.mat", mdict={"fitness":fitness_history})
-
+    optimal_controller = Controller(individual=optimal_individual)
+    optimal_controller.setup()
     ## Close loop simluation
-    T, plunge_close, pitch_close, bend_close, input1, input2, input3 = close_time_march(A, B, C, D, K_optimal, timesteps, dt, H5gust)
+    T, plunge_close, pitch_close, bend_close, input1, input2, input3 = close_time_march(A, B, C, D, optimal_controller, timesteps, dt, H5gust)
+
+    optimal_controller.save("GANN/network_weights.mat")
+    sio.savemat("GANN/fitness.mat", mdict={"fitness": fitness_history})
 
     ## Plot results
     plt.figure(1)

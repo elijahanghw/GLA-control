@@ -83,7 +83,7 @@ uNOISE = 0.1*randn(3, timesteps);
 
 for t = 1:timesteps
     % Compute "Measurements"
-    U = cat(1,u,rom_gustc(:,t));
+    U = cat(1,u,rom_gustb(:,t));
     x_new = A_sys*x_old + B_aug*U + Vd*uDIST(:,t); %+ rom_gust5(:,t); 
     y = C_sys*x_new + Vn*uNOISE(:,t);
     plunge_open(t,1) = y(1,1);
@@ -133,7 +133,7 @@ hold off;
 grid on;
 
 %% Load LQR Control
-K_optimal = load("../past_trainings/lqr7/K_optimal.mat").K_optimal;
+K_optimal = load("past_trainings/lqr7/K_optimal.mat").K_optimal;
 
 %% Close Loop Time marching simulation
 % Initialize states
@@ -152,7 +152,7 @@ T = zeros(timesteps,1);
 
 for t = 1:timesteps
     % Compute "measurements"
-    x_new_close = A_sys*x_old_close + rom_gustc(:,t) - B_sys*K_optimal*xhat_old_close;
+    x_new_close = A_sys*x_old_close + rom_gustb(:,t) - B_sys*K_optimal*xhat_old_close;
     y = C_sys * x_new_close;
     plunge_close(t,1) = y(1,1);
     pitch_close(t,1) = y(2,1);
@@ -165,7 +165,7 @@ for t = 1:timesteps
     x_old_close = x_new_close;
 
     % Estimate states
-    U = cat(1,inputs,rom_gustc(:,t));
+    U = cat(1,inputs,rom_gustb(:,t));
     xhat_new_close = (A_sys-Kf*C_sys)*xhat_old_close + B_aug*U + Kf*y;
     %yhat = C_sys * xhat_new;
     % plungehat_open(t,1) = yhat(1,1);
@@ -177,12 +177,12 @@ end
 %% Plot results
 
 figure(5);
-plot(T,plungehat_open, LineWidth=1.5);
+plot(T,plungehat_open, "k--", LineWidth=3);
 hold on;
-plot(T,plunge_close, LineWidth=1.5);
+plot(T,plunge_close, "r", LineWidth=3);
 %legend(["Open loop" "Closed-loop"])
 xlabel("time (s)")
-ylabel("plunge displacement (m)")
+ylabel("\Delta h (m)")
 hold off;
 grid on;
 set(gcf,'position',[300,300,500,450])
@@ -190,12 +190,12 @@ fontsize(14, "points")
 xlim([0 5])
 
 figure(6);
-plot(T,pitchhat_open/pi*180, LineWidth=1.5);
+plot(T,pitchhat_open/pi*180, "k--", LineWidth=3);
 hold on;
-plot(T,pitch_close/pi*180, LineWidth=1.5);
+plot(T,pitch_close/pi*180, "r", LineWidth=3);
 %legend(["Open loop" "Close loop"])
 xlabel("time (s)")
-ylabel("pitch angle (deg)")
+ylabel("\Delta \alpha (deg)")
 hold off;
 grid on;
 set(gcf,'position',[300,300,500,450])
@@ -203,12 +203,12 @@ fontsize(14, "points")
 xlim([0 5])
 
 figure(7);
-plot(T,bendhat_open*200, LineWidth=1.5);
+plot(T,bendhat_open*200, "k--", LineWidth=3);
 hold on;
-plot(T,bend_close/0.5*100, LineWidth=1.5);
+plot(T,bend_close/0.5*100, "r", LineWidth=3);
 legend(["Open-loop" "Closed-loop"])
 xlabel("time (s)")
-ylabel("relative displacement (% b/2)")
+ylabel("\Delta z_{tip} (% b/2)")
 hold off;
 grid on;
 set(gcf,'position',[300,300,500,450])
@@ -216,10 +216,10 @@ fontsize(14, "points")
 xlim([0 5])
 
 figure(8);
-plot(T, input1/pi*180, LineWidth=1.5);
+plot(T, input1/pi*180, LineWidth=3);
 hold on;
-plot(T, input2/pi*180, LineWidth=1.5);
-plot(T, input3/pi*180, LineWidth=1.5);
+plot(T, input2/pi*180, LineWidth=3);
+plot(T, input3/pi*180, LineWidth=3);
 xlabel("time (s)")
 ylabel("\delta (deg)")
 legend(["CS1" "CS2" "CS3"])

@@ -7,7 +7,7 @@ from networks import *
 from utils import *
 
 class Agent:
-    def __init__(self, env, nodes=128, a_lr=1e-4, c_lr=1e-3, gamma=0.99, tau=1e-2, mem_size=50000):
+    def __init__(self, env, nodes=256, a_lr=5e-4, c_lr=1e-3, gamma=0.99, tau=5e-3, mem_size=100000):
         self.num_states = env.state_space.shape[0]
         self.num_actions = env.action_space.shape[0]
         self.gamma = gamma

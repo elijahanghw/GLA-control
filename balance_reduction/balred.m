@@ -38,7 +38,7 @@ fbend = zeros(timesteps,1);
 T = zeros(timesteps,1);
 
 for t = 1:timesteps
-    x_new = fsys.A*x_old + fsys.B*U + H20_gust(:,t);
+    x_new = fsys.A*x_old + fsys.B*U + H5_gust(:,t);
     y = fsys.C * x_new;
     fplunge(t,1) = y(1,1);
     fpitch(t,1) = y(2,1);
@@ -124,69 +124,69 @@ end
 %% Plot and compare
 figure(2);
 hold on;
-plot(T,fplunge, "k", "DisplayName", "2528 states", "LineWidth", 2);
-plot(T,rplunge, "r--", "DisplayName","18 states", "LineWidth", 2);
+plot(T(:,1),fplunge(:,1), "k", "DisplayName", "2528 states", "LineWidth", 3);
+plot(T(:,1),rplunge(:,1), "r--", "DisplayName","18 states", "LineWidth", 3);
 grid on;
 %legend();
 xlabel("time (s)")
-ylabel("Plunge (m)")
+ylabel("\Delta h (m)")
 hold off;
 
 figure(3);
 hold on;
-plot(T,fpitch/pi*180, "k", "DisplayName", "2528 states", "LineWidth", 2);
-plot(T,rpitch/pi*180, "r--", "DisplayName","18 states", "LineWidth", 2);
+plot(T(:,1),fpitch(:,1)/pi*180, "k", "DisplayName", "2528 states", "LineWidth", 3);
+plot(T(:,1),rpitch(:,1)/pi*180, "r--", "DisplayName","18 states", "LineWidth", 3);
 grid on;
 %legend();
 xlabel("time (s)")
-ylabel("Pitch (deg)")
+ylabel("\Delta \alpha (deg)")
 hold off;
 
 figure(4);
 hold on;
-plot(T,fbend*200, "k", "DisplayName", "2528 states", "LineWidth", 2);
-plot(T,rbend*200, "r--", "DisplayName","18 states", "LineWidth", 2);
+plot(T(:,1),fbend(:,1)*200, "k", "DisplayName", "2528 states", "LineWidth", 3);
+plot(T(:,1),rbend(:,1)*200, "r--", "DisplayName","18 states", "LineWidth", 3);
 grid on;
 legend();
 xlabel("time (s)")
-ylabel("Relative tip displacement (% b/2)")
+ylabel("\Delta z_{tip} (% b/2)")
 hold off;
 
 %% Plot different responses
 figure(5);
 hold on;
-plot(T(:,1),rplunge(:,1), "DisplayName", "H = 5m", "LineWidth", 2);
-plot(T(:,2),rplunge(:,2), "DisplayName", "H = 10m", "LineWidth", 2);
-plot(T(:,3),rplunge(:,3), "DisplayName", "H = 15m", "LineWidth", 2);
-plot(T(:,4),rplunge(:,4), "DisplayName", "H = 20m", "LineWidth", 2);
+plot(T(:,1),rplunge(:,1), "DisplayName", "H = 5m", "LineWidth", 3);
+plot(T(:,2),rplunge(:,2), "DisplayName", "H = 10m", "LineWidth", 3);
+plot(T(:,3),rplunge(:,3), "DisplayName", "H = 15m", "LineWidth", 3);
+plot(T(:,4),rplunge(:,4), "DisplayName", "H = 20m", "LineWidth", 3);
 grid on;
 %legend();
 xlabel("time (s)")
-ylabel("Plunge (m)")
+ylabel("\Delta h (m)")
 hold off;
 
 figure(6);
 hold on;
-plot(T(:,1),rpitch(:,1)/pi*180, "DisplayName", "H = 5m", "LineWidth", 2);
-plot(T(:,2),rpitch(:,2)/pi*180, "DisplayName", "H = 10m", "LineWidth", 2);
-plot(T(:,3),rpitch(:,3)/pi*180, "DisplayName", "H = 15m", "LineWidth", 2);
-plot(T(:,4),rpitch(:,4)/pi*180, "DisplayName", "H = 20m", "LineWidth", 2);
+plot(T(:,1),rpitch(:,1)/pi*180, "DisplayName", "H = 5m", "LineWidth", 3);
+plot(T(:,2),rpitch(:,2)/pi*180, "DisplayName", "H = 10m", "LineWidth", 3);
+plot(T(:,3),rpitch(:,3)/pi*180, "DisplayName", "H = 15m", "LineWidth", 3);
+plot(T(:,4),rpitch(:,4)/pi*180, "DisplayName", "H = 20m", "LineWidth", 3);
 grid on;
-legend();
+%legend();
 xlabel("time (s)")
-ylabel("Pitch (deg)")
+ylabel("\Delta \alpha (deg)")
 hold off;
 
 figure(7);
 hold on;
-plot(T(:,1),rbend(:,1)*200, "DisplayName", "H = 5m", "LineWidth", 2);
-plot(T(:,2),rbend(:,2)*200, "DisplayName", "H = 10m", "LineWidth", 2);
-plot(T(:,3),rbend(:,3)*200, "DisplayName", "H = 15m", "LineWidth", 2);
-plot(T(:,4),rbend(:,4)*200, "DisplayName", "H = 20m", "LineWidth", 2);
+plot(T(:,1),rbend(:,1)*200, "DisplayName", "H = 5m", "LineWidth", 3);
+plot(T(:,2),rbend(:,2)*200, "DisplayName", "H = 10m", "LineWidth", 3);
+plot(T(:,3),rbend(:,3)*200, "DisplayName", "H = 15m", "LineWidth", 3);
+plot(T(:,4),rbend(:,4)*200, "DisplayName", "H = 20m", "LineWidth", 3);
 grid on;
-%legend();
+legend();
 xlabel("time (s)")
-ylabel("Relative tip displacement (% b/2)")
+ylabel("\Delta z_{tip} (% b/2)")
 hold off;
 
 %% Bode plot

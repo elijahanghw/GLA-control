@@ -25,7 +25,7 @@ env = Environment()
 agent = Agent(env)
 noise = OUNoise(env.norm_action_space, dt)
 
-batch_size = 128
+batch_size = 256
 rewards = []
 avg_rewards = []
 
@@ -47,17 +47,14 @@ for episode in tqdm.tqdm(range(num_episodes), desc='Episode', position=0):
             agent.update(batch_size)
 
         episode_reward += reward
-    
-    rewards.append(episode_reward)
+        
+    rewards.append(episode_reward/1000)
     avg_rewards.append(np.mean(rewards[-10:]))
-    tqdm.tqdm.write(f"Episode: {episode}      Reward: {episode_reward}")
+    tqdm.tqdm.write(f"Episode: {episode}      Reward: {episode_reward/1000}")
 
 # Save model
 agent.save_actor_critic()
-
-# Save rewards
 sio.savemat("ddpg/rewards.mat", mdict={"rewards": rewards, "avg_rewards": avg_rewards})
-
 # Plot Rewards
 plt.plot(rewards)
 plt.plot(avg_rewards)

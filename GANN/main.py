@@ -32,7 +32,7 @@ if __name__ == '__main__':
     T, plunge, pitch, bend = open_time_march(A, B, C, D, timesteps, dt, H5gust)
 
     ## GE for nn control
-    generations = 10
+    generations = 1000
     ga = Genetic(3, 3, num_pop=100)
     ga.initialize()
     fitness_history = np.zeros(generations)
@@ -47,13 +47,13 @@ if __name__ == '__main__':
             # Simulate and compute fitness
             T, plunge_close, pitch_close, bend_close, i1, i2, i3 = close_time_march(A, B, C, D, controller, timesteps, dt, H5gust)
 
-            overshoot_index = -max(abs(plunge_close)) - 100*max(abs(pitch_close)) - 7000*max(abs(bend_close))
+            overshoot_index = - max(abs(plunge_close)) - 100*max(abs(pitch_close)) - 50000*max(abs(bend_close))
                 
-            settling_index = -np.sum(T*abs(plunge_close + abs(10*pitch_close) + abs(200*bend_close)))
+            settling_index = -np.sum(T*(abs(plunge_close) + abs(10*pitch_close) + abs(500*bend_close)))
 
             input_index = -max(abs(i1)) - max(abs(i2)) - max(abs(i3))
 
-            fitness = 5*overshoot_index + 0.08*settling_index + 3*input_index
+            fitness = 5*overshoot_index + 0.2*settling_index + 10*input_index
             ga.fitness[i] = (species, fitness)
         ga.next_gen()
         fitness_history[gen] = ga.fitness_sorted[0][1]

@@ -10,7 +10,7 @@ class Genetic:
         self.hidden1 = 4
         self.hidden2 = 4
         self.num_offspring = int(offsprings*num_pop)
-        self.numbits = self.num_inputs*self.hidden1 + self.hidden1 + self.hidden1*self.hidden2 + self.hidden2 + self.hidden2*self.num_outputs
+        self.numbits = self.num_inputs*self.hidden1 + self.hidden1*self.hidden2 + self.hidden2*self.num_outputs # + self.num_outputs
 
     def initialize(self):
         self.population = []
@@ -18,7 +18,7 @@ class Genetic:
         for i in range(self.num_pop):
             individual = np.zeros(self.numbits)
             for j in range(self.numbits):
-                individual[j] = np.random.uniform(-10, 10)
+                individual[j] = np.random.uniform(-1, 1)
             self.population.append(individual) 
 
     def roulette(self, fitness_sorted, offset=0.1):

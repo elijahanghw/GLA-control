@@ -44,13 +44,15 @@ gust4 = load("../model/contgust/contgust4.mat").gustz;
 gusta = zeros(2528, length(gust1));
 gustb = zeros(2528, length(gust1));
 gustc = zeros(2528, length(gust1));
+gustd = zeros(2528, length(gust1));
 
 for i= 1:timesteps
     gusta(1:208, i) = 0.006*gust1(i);
     gustb(1:208, i) = 0.006*gust2(i);
     gustc(1:208, i) = 0.006*gust3(i);
+    gustd(1:208, i) = 0.006*gust4(i);
 end   
-
+%%
 rom_gust5 = T_rom * H5_gust;
 rom_gust10 = T_rom * H10_gust;
 rom_gust15 = T_rom * H15_gust;

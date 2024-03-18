@@ -27,4 +27,16 @@ def gusts():
     H20gust = sio.loadmat('model/discretegusts/H20gust.mat')["arr"]
     H20gust = np.matmul(T_rom, H20gust)
 
-    return H5gust, H10gust, H15gust, H20gust
+    GustA = sio.loadmat('model/contgust/gusta.mat')["gusta"]
+    GustA = np.matmul(T_rom, GustA)
+
+    GustB = sio.loadmat('model/contgust/gustb.mat')["gustb"]
+    GustB = np.matmul(T_rom, GustB)
+
+    GustC = sio.loadmat('model/contgust/gustc.mat')["gustc"]
+    GustC = np.matmul(T_rom, GustC)
+
+    GustD = sio.loadmat('model/contgust/gustd.mat')["gustd"]
+    GustD = np.matmul(T_rom, GustD)
+
+    return H5gust, H10gust, H15gust, H20gust, GustA, GustB, GustC, GustD 

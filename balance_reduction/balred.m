@@ -35,7 +35,7 @@ x_old = zeros(num_states,1);
 fplunge = zeros(timesteps,1);
 fpitch = zeros(timesteps,1);
 fbend = zeros(timesteps,1);
-T = zeros(timesteps,1);
+time = zeros(timesteps,1);
 
 for t = 1:timesteps
     x_new = fsys.A*x_old + fsys.B*U + H5_gust(:,t);
@@ -43,7 +43,7 @@ for t = 1:timesteps
     fplunge(t,1) = y(1,1);
     fpitch(t,1) = y(2,1);
     fbend(t,1) = y(3,1);
-    T(t,1) = t*dt;
+    time(t,1) = t*dt;
     x_old = x_new;
 end
 
@@ -77,7 +77,7 @@ x_old = zeros(truncated_state,1);
 rplunge = zeros(timesteps,4);
 rpitch = zeros(timesteps,4);
 rbend = zeros(timesteps,4);
-T = zeros(timesteps,4);
+time = zeros(timesteps,4);
 
 for t = 1:timesteps
     x_new = rsys.A*x_old + rsys.B*U + rom_gust5(:,t);
@@ -85,7 +85,7 @@ for t = 1:timesteps
     rplunge(t,1) = y(1,1);
     rpitch(t,1) = y(2,1);
     rbend(t,1) = y(3,1);
-    T(t,1) = t*dt;
+    time(t,1) = t*dt;
     x_old = x_new;
 end
 
@@ -96,7 +96,7 @@ for t = 1:timesteps
     rplunge(t,2) = y(1,1);
     rpitch(t,2) = y(2,1);
     rbend(t,2) = y(3,1);
-    T(t,2) = t*dt;
+    time(t,2) = t*dt;
     x_old = x_new;
 end
 
@@ -107,7 +107,7 @@ for t = 1:timesteps
     rplunge(t,3) = y(1,1);
     rpitch(t,3) = y(2,1);
     rbend(t,3) = y(3,1);
-    T(t,3) = t*dt;
+    time(t,3) = t*dt;
     x_old = x_new;
 end
 
@@ -118,14 +118,14 @@ for t = 1:timesteps
     rplunge(t,4) = y(1,1);
     rpitch(t,4) = y(2,1);
     rbend(t,4) = y(3,1);
-    T(t,4) = t*dt;
+    time(t,4) = t*dt;
     x_old = x_new;
 end
 %% Plot and compare
 figure(2);
 hold on;
-plot(T(:,1),fplunge(:,1), "k", "DisplayName", "2528 states", "LineWidth", 3);
-plot(T(:,1),rplunge(:,1), "r--", "DisplayName","18 states", "LineWidth", 3);
+plot(time(:,1),fplunge(:,1), "k", "DisplayName", "2528 states", "LineWidth", 3);
+plot(time(:,1),rplunge(:,1), "r--", "DisplayName","18 states", "LineWidth", 3);
 grid on;
 %legend();
 xlabel("time (s)")
@@ -134,8 +134,8 @@ hold off;
 
 figure(3);
 hold on;
-plot(T(:,1),fpitch(:,1)/pi*180, "k", "DisplayName", "2528 states", "LineWidth", 3);
-plot(T(:,1),rpitch(:,1)/pi*180, "r--", "DisplayName","18 states", "LineWidth", 3);
+plot(time(:,1),fpitch(:,1)/pi*180, "k", "DisplayName", "2528 states", "LineWidth", 3);
+plot(time(:,1),rpitch(:,1)/pi*180, "r--", "DisplayName","18 states", "LineWidth", 3);
 grid on;
 %legend();
 xlabel("time (s)")
@@ -144,8 +144,8 @@ hold off;
 
 figure(4);
 hold on;
-plot(T(:,1),fbend(:,1)*200, "k", "DisplayName", "2528 states", "LineWidth", 3);
-plot(T(:,1),rbend(:,1)*200, "r--", "DisplayName","18 states", "LineWidth", 3);
+plot(time(:,1),fbend(:,1)*200, "k", "DisplayName", "2528 states", "LineWidth", 3);
+plot(time(:,1),rbend(:,1)*200, "r--", "DisplayName","18 states", "LineWidth", 3);
 grid on;
 legend();
 xlabel("time (s)")
@@ -155,10 +155,10 @@ hold off;
 %% Plot different responses
 figure(5);
 hold on;
-plot(T(:,1),rplunge(:,1), "DisplayName", "H = 5m", "LineWidth", 3);
-plot(T(:,2),rplunge(:,2), "DisplayName", "H = 10m", "LineWidth", 3);
-plot(T(:,3),rplunge(:,3), "DisplayName", "H = 15m", "LineWidth", 3);
-plot(T(:,4),rplunge(:,4), "DisplayName", "H = 20m", "LineWidth", 3);
+plot(time(:,1),rplunge(:,1), "DisplayName", "H = 5m", "LineWidth", 3);
+plot(time(:,2),rplunge(:,2), "DisplayName", "H = 10m", "LineWidth", 3);
+plot(time(:,3),rplunge(:,3), "DisplayName", "H = 15m", "LineWidth", 3);
+plot(time(:,4),rplunge(:,4), "DisplayName", "H = 20m", "LineWidth", 3);
 grid on;
 %legend();
 xlabel("time (s)")
@@ -167,10 +167,10 @@ hold off;
 
 figure(6);
 hold on;
-plot(T(:,1),rpitch(:,1)/pi*180, "DisplayName", "H = 5m", "LineWidth", 3);
-plot(T(:,2),rpitch(:,2)/pi*180, "DisplayName", "H = 10m", "LineWidth", 3);
-plot(T(:,3),rpitch(:,3)/pi*180, "DisplayName", "H = 15m", "LineWidth", 3);
-plot(T(:,4),rpitch(:,4)/pi*180, "DisplayName", "H = 20m", "LineWidth", 3);
+plot(time(:,1),rpitch(:,1)/pi*180, "DisplayName", "H = 5m", "LineWidth", 3);
+plot(time(:,2),rpitch(:,2)/pi*180, "DisplayName", "H = 10m", "LineWidth", 3);
+plot(time(:,3),rpitch(:,3)/pi*180, "DisplayName", "H = 15m", "LineWidth", 3);
+plot(time(:,4),rpitch(:,4)/pi*180, "DisplayName", "H = 20m", "LineWidth", 3);
 grid on;
 %legend();
 xlabel("time (s)")
@@ -179,10 +179,10 @@ hold off;
 
 figure(7);
 hold on;
-plot(T(:,1),rbend(:,1)*200, "DisplayName", "H = 5m", "LineWidth", 3);
-plot(T(:,2),rbend(:,2)*200, "DisplayName", "H = 10m", "LineWidth", 3);
-plot(T(:,3),rbend(:,3)*200, "DisplayName", "H = 15m", "LineWidth", 3);
-plot(T(:,4),rbend(:,4)*200, "DisplayName", "H = 20m", "LineWidth", 3);
+plot(time(:,1),rbend(:,1)*200, "DisplayName", "H = 5m", "LineWidth", 3);
+plot(time(:,2),rbend(:,2)*200, "DisplayName", "H = 10m", "LineWidth", 3);
+plot(time(:,3),rbend(:,3)*200, "DisplayName", "H = 15m", "LineWidth", 3);
+plot(time(:,4),rbend(:,4)*200, "DisplayName", "H = 20m", "LineWidth", 3);
 grid on;
 legend();
 xlabel("time (s)")
@@ -190,47 +190,47 @@ ylabel("\Delta z_{tip} (% b/2)")
 hold off;
 
 %% Bode plot
-w= {1, 100};
-
-figure(8)
-bode(rsys, w);
-
-fig2 = figure(9) % bode plot for cs1
-opts = bodeoptions
-opts.Title.String = '';
-opts.Title.FontSize = 10;
-opts.FreqUnits = 'Hz';
-bodeplot(rsys(1,1), w, opts);
-hold on;
-bodeplot(rsys(2,1), w, opts);
-bodeplot(rsys(3,1), w, opts);
-legend(["Plunge" "Pitch" "Tip Bending"])
-grid on;
-fontsize(fig2, scale=1.6)
-
-
-fig3 = figure(10) % bode plot for cs2
-opts = bodeoptions
-opts.Title.String = '';
-opts.Title.FontSize = 10;
-opts.FreqUnits = 'Hz';
-bodeplot(rsys(1,2), w, opts);
-hold on;
-bode(rsys(2,2), w, opts);
-bode(rsys(3,2), w, opts);
-%legend(["Plunge" "Pitch" "Tip Bending"])
-grid on;
-fontsize(fig3, scale=1.6)
-
-fig4 = figure(11) % bode plot for cs3
-opts = bodeoptions
-opts.Title.String = '';
-opts.Title.FontSize = 10;
-opts.FreqUnits = 'Hz';
-bodeplot(rsys(1,3), w, opts);
-hold on;
-bode(rsys(2,3), w, opts);
-bode(rsys(3,3), w, opts);
-%legend(["Plunge" "Pitch" "Tip Bending"])
-grid on;
-fontsize(fig4, scale=1.6)
+% w= {1, 100};
+% 
+% figure(8)
+% bode(rsys, w);
+% 
+% fig2 = figure(9) % bode plot for cs1
+% opts = bodeoptions
+% opts.Title.String = '';
+% opts.Title.FontSize = 10;
+% opts.FreqUnits = 'Hz';
+% bodeplot(rsys(1,1), w, opts);
+% hold on;
+% bodeplot(rsys(2,1), w, opts);
+% bodeplot(rsys(3,1), w, opts);
+% legend(["Plunge" "Pitch" "Tip Bending"])
+% grid on;
+% fontsize(fig2, scale=1.6)
+% 
+% 
+% fig3 = figure(10) % bode plot for cs2
+% opts = bodeoptions
+% opts.Title.String = '';
+% opts.Title.FontSize = 10;
+% opts.FreqUnits = 'Hz';
+% bodeplot(rsys(1,2), w, opts);
+% hold on;
+% bode(rsys(2,2), w, opts);
+% bode(rsys(3,2), w, opts);
+% %legend(["Plunge" "Pitch" "Tip Bending"])
+% grid on;
+% fontsize(fig3, scale=1.6)
+% 
+% fig4 = figure(11) % bode plot for cs3
+% opts = bodeoptions
+% opts.Title.String = '';
+% opts.Title.FontSize = 10;
+% opts.FreqUnits = 'Hz';
+% bodeplot(rsys(1,3), w, opts);
+% hold on;
+% bode(rsys(2,3), w, opts);
+% bode(rsys(3,3), w, opts);
+% %legend(["Plunge" "Pitch" "Tip Bending"])
+% grid on;
+% fontsize(fig4, scale=1.6)

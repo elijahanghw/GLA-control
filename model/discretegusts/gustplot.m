@@ -30,12 +30,14 @@ gust20(2*H/10*200:end) = 0;
 %% Plot
 figure()
 hold on;
-plot(s,gust5, LineWidth=1.5)
-plot(s,gust10, LineWidth=1.5)
-plot(s,gust15, LineWidth=1.5)
-plot(s,gust20, LineWidth=1.5)
+% plot(s,gust5, LineWidth=1.5)
+plot(s,gust10, LineWidth=3)
+plot(s,gust15, LineWidth=3)
+plot(s,gust20, LineWidth=3)
 
 grid on;
 xlabel("Distance (m)")
-ylabel("w_g (m/s)")
-legend(["H = 5m" "H = 10m" "H = 15m" "H = 20m"])
+ylabel("W_g (m/s)")
+legend(["H = 10m" "H = 15m" "H = 20m"])
+set(gcf,'position',[300,300,800,400])
+fontsize(25, "points")

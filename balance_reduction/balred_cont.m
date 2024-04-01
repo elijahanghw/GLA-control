@@ -168,6 +168,8 @@ grid on;
 xlabel("time (s)")
 ylabel("Plunge (m)")
 hold off;
+set(gcf,'position',[300,300,500,450])
+fontsize(25, "points")
 
 figure(3);
 hold on;
@@ -178,6 +180,8 @@ grid on;
 xlabel("time (s)")
 ylabel("Pitch (deg)")
 hold off;
+set(gcf,'position',[300,300,500,450])
+fontsize(25, "points")
 
 figure(4);
 hold on;
@@ -188,28 +192,31 @@ legend();
 xlabel("time (s)")
 ylabel("Relative tip displacement (% b/2)")
 hold off;
-
+set(gcf,'position',[300,300,500,450])
+fontsize(25, "points")
 %% Plot different responses
 figure(5);
 hold on;
 plot(T(:,1),rplunge(:,1), "DisplayName", "Gust A", "LineWidth", 3);
 plot(T(:,2),rplunge(:,2), "DisplayName", "Gust B", "LineWidth", 3);
 plot(T(:,3),rplunge(:,3), "DisplayName", "Gust C", "LineWidth", 3);
-%plot(T(:,4),rplunge(:,4), "DisplayName", "Gust D", "LineWidth", 2);
+plot(T(:,4),rplunge(:,4), "DisplayName", "Gust D", "LineWidth", 2);
 %plot(T(:,5),rplunge(:,5), "DisplayName", "Gust Test", "LineWidth", 2);
 grid on;
-%legend();
+legend();
 xlabel("time (s)")
 ylabel("\Delta h (m)")
 xlim([0 5])
 hold off;
+set(gcf,'position',[300,300,500,450])
+fontsize(25, "points")
 
 figure(6);
 hold on;
 plot(T(:,1),rpitch(:,1)/pi*180, "DisplayName", "Gust A", "LineWidth", 3);
 plot(T(:,2),rpitch(:,2)/pi*180, "DisplayName", "Gust B", "LineWidth", 3);
 plot(T(:,3),rpitch(:,3)/pi*180, "DisplayName", "Gust C", "LineWidth", 3);
-%plot(T(:,4),rpitch(:,4)/pi*180, "DisplayName", "Gust D", "LineWidth", 2);
+plot(T(:,4),rpitch(:,4)/pi*180, "DisplayName", "Gust D", "LineWidth", 2);
 %plot(T(:,5),rpitch(:,5)/pi*180, "DisplayName", "Gust Test", "LineWidth", 2);
 grid on;
 %legend();
@@ -217,20 +224,24 @@ xlabel("time (s)")
 ylabel("\Delta \alpha (deg)")
 xlim([0 5])
 hold off;
+set(gcf,'position',[300,300,500,450])
+fontsize(25, "points")
 
 figure(7);
 hold on;
 plot(T(:,1),rbend(:,1)*200, "DisplayName", "Gust A", "LineWidth", 3);
 plot(T(:,2),rbend(:,2)*200, "DisplayName", "Gust B", "LineWidth", 3);
 plot(T(:,3),rbend(:,3)*200, "DisplayName", "Gust C", "LineWidth", 3);
-%plot(T(:,4),rbend(:,4)*200, "DisplayName", "Gust D", "LineWidth", 2);
+plot(T(:,4),rbend(:,4)*200, "DisplayName", "Gust D", "LineWidth", 2);
 %plot(T(:,5),rbend(:,5)*200, "DisplayName", "Gust Test", "LineWidth", 2);
 grid on;
-legend();
+%legend();
 xlabel("time (s)")
 ylabel("\Delta z_{tip} (% b/2)")
 xlim([0 5])
 hold off;
+set(gcf,'position',[300,300,500,450])
+fontsize(25, "points")
 
 %% Bode plot
 % w= {1, 100};

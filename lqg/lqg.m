@@ -44,13 +44,18 @@ gust4 = load("../model/contgust/contgust4.mat").gustz;
 gusta = zeros(2528, length(gust1));
 gustb = zeros(2528, length(gust1));
 gustc = zeros(2528, length(gust1));
+gustd = zeros(2528, length(gust1));
+
+gust_input = zeros(2528,1);
+gust_input(1:208,1) = 1;
 
 for i= 1:timesteps
     gusta(1:208, i) = 0.006*gust1(i);
     gustb(1:208, i) = 0.006*gust2(i);
     gustc(1:208, i) = 0.006*gust3(i);
+    gustd(1:208, i) = 0.006*gust4(i);
 end   
-
+%%
 rom_gust5 = T_rom * H5_gust;
 rom_gust10 = T_rom * H10_gust;
 rom_gust15 = T_rom * H15_gust;
@@ -59,13 +64,14 @@ rom_gust20 = T_rom * H20_gust;
 rom_gusta = T_rom * gusta;
 rom_gustb = T_rom * gustb;
 rom_gustc = T_rom * gustc;
+rom_gustd = T_rom * gustd;
 %% Create Kalman filter
 Vd = 0.001;
 Vn = [0.5, 0, 0; 0, 0.005, 0; 0, 0, 0.002];
 [kalmf, Kf, P] = kalman(raug,Vd, Vn);
 
 %% Select gust
-gust_select = rom_gust20;
+gust_select = rom_gust10;
 
 %% Open Loop Time marching simulation
 % Initialize states
@@ -104,36 +110,6 @@ for t = 1:timesteps
     xhat_old = xhat_new;
 end
 
-%% Plot kalman filter
-% figure(1)
-% plot(T,plunge_open, 'k', LineWidth=1);
-% hold on;
-% plot(T,plungehat_open, 'r--', LineWidth=1.5);
-% %legend(["Measurement" "Estimate"])
-% xlabel("time (s)")
-% ylabel("plunge displacement (m)")
-% hold off;
-% grid on;
-% 
-% figure(2)
-% plot(T,pitch_open/pi*180, 'k', LineWidth=1);
-% hold on;
-% plot(T,pitchhat_open/pi*180, 'r--', LineWidth=1.5);
-% legend(["Measurement" "Estimate"])
-% xlabel("time (s)")
-% ylabel("pitch angle (deg)")
-% hold off;
-% grid on;
-% 
-% figure(3)
-% plot(T,bend_open*200, 'k', LineWidth=1);
-% hold on;
-% plot(T,bendhat_open*200, 'r--', LineWidth=1.5);
-% %legend(["Measurement" "Estimate"])
-% xlabel("time (s)")
-% ylabel("relative displacement (% b/2)")
-% hold off;
-% grid on;
 
 %% Load LQR Control
 K_optimal = load("past_trainings/lqr7/K_optimal.mat").K_optimal;
@@ -188,8 +164,8 @@ xlabel("time (s)")
 ylabel("\Delta h (m)")
 hold off;
 grid on;
-set(gcf,'position',[300,300,500,450])
-fontsize(35, "points")
+set(gcf,'position',[300,300,500,500])
+fontsize(25, "points")
 xlim([0 simulation_time])
 
 figure(6);
@@ -201,8 +177,8 @@ xlabel("time (s)")
 ylabel("\Delta \alpha (deg)")
 hold off;
 grid on;
-set(gcf,'position',[300,300,500,450])
-fontsize(35, "points")
+set(gcf,'position',[300,300,500,500])
+fontsize(25, "points")
 xlim([0 simulation_time])
 
 figure(7);
@@ -214,9 +190,10 @@ xlabel("time (s)")
 ylabel("\Delta z_{tip} (% b/2)")
 hold off;
 grid on;
-set(gcf,'position',[300,300,500,450])
-fontsize(35, "points")
+set(gcf,'position',[300,300,500,500])
+fontsize(25, "points")
 xlim([0 simulation_time])
+ylim([-0.7 0.7])
 
 figure(8);
 plot(T, input1/pi*180, LineWidth=3);
@@ -227,9 +204,10 @@ xlabel("time (s)")
 ylabel("\delta (deg)")
 legend(["CS1" "CS2" "CS3"])
 grid on;
-set(gcf,'position',[300,300,500,450])
-fontsize(35, "points")
+set(gcf,'position',[300,300,500,500])
+fontsize(25, "points")
 xlim([0 simulation_time])
+ylim([-4, 4])
 
 %% Compute imput rates
 input3_rate = zeros(size(input1));

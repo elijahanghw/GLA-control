@@ -7,8 +7,8 @@ class Genetic:
         self.num_pop = num_pop
         self.num_outputs = num_outputs
         self.num_inputs = num_inputs
-        self.hidden1 = 4
-        self.hidden2 = 4
+        self.hidden1 = 8
+        self.hidden2 = 8
         self.num_offspring = int(offsprings*num_pop)
         self.numbits = self.num_inputs*self.hidden1 + self.hidden1*self.hidden2 + self.hidden2*self.num_outputs # + self.num_outputs
 

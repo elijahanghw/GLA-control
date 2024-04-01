@@ -19,20 +19,20 @@ if __name__ == '__main__':
     ds = 1/num_chord
     dt = ds*ref_chord/V_inf
 
-    simulation_time = 5
+    simulation_time = 4
     timesteps = int(simulation_time/dt)
 
     ## Load matrices
     A, B, C, D, T_rom, Ti_rom = system_mat()
-    H5gust, H10gust, H15gust, H20gust = gusts()
+    H5gust, H10gust, H15gust, H20gust, GustA, GustB, GustC, GustD = gusts()
     num_states = A.shape[0]
     sys = control.ss(A, B, C, D, dt)
 
     ## Open loop simulation
-    T, plunge, pitch, bend = open_time_march(A, B, C, D, timesteps, dt, H5gust)
+    T, plunge, pitch, bend = open_time_march(A, B, C, D, timesteps, dt, H10gust)
 
     ## GE for nn control
-    generations = 1000
+    generations = 500
     ga = Genetic(3, 3, num_pop=100)
     ga.initialize()
     fitness_history = np.zeros(generations)
@@ -45,15 +45,20 @@ if __name__ == '__main__':
             controller = Controller(individual=species)
             controller.setup()
             # Simulate and compute fitness
-            T, plunge_close, pitch_close, bend_close, i1, i2, i3 = close_time_march(A, B, C, D, controller, timesteps, dt, H5gust)
+            overshoot_index = 0
+            settling_index = 0
+            input_index = 0
+            fitness = 0
+            for g in [H10gust, H20gust, GustA, GustC, GustD]:
+                T, plunge_close, pitch_close, bend_close, i1, i2, i3 = close_time_march(A, B, C, D, controller, timesteps, dt, g)
 
-            overshoot_index = - max(abs(plunge_close)) - 100*max(abs(pitch_close)) - 50000*max(abs(bend_close))
-                
-            settling_index = -np.sum(T*(abs(plunge_close) + abs(10*pitch_close) + abs(500*bend_close)))
+                overshoot_index += -max(abs(plunge_close)) - 5*max(abs(pitch_close)) - 50000*max(abs(bend_close))
+                    
+                settling_index += -np.sum(T*(abs(plunge_close) + abs(10*pitch_close) + abs(5000*bend_close)))
 
-            input_index = -max(abs(i1)) - max(abs(i2)) - max(abs(i3))
+                input_index += -max(abs(i1)) - max(abs(i2)) - max(abs(i3))
 
-            fitness = 5*overshoot_index + 0.2*settling_index + 10*input_index
+                fitness += overshoot_index + settling_index + input_index
             ga.fitness[i] = (species, fitness)
         ga.next_gen()
         fitness_history[gen] = ga.fitness_sorted[0][1]
@@ -64,7 +69,7 @@ if __name__ == '__main__':
     optimal_controller = Controller(individual=optimal_individual)
     optimal_controller.setup()
     ## Close loop simluation
-    T, plunge_close, pitch_close, bend_close, input1, input2, input3 = close_time_march(A, B, C, D, optimal_controller, timesteps, dt, H5gust)
+    T, plunge_close, pitch_close, bend_close, input1, input2, input3 = close_time_march(A, B, C, D, optimal_controller, timesteps, dt, H10gust)
 
     optimal_controller.save("GANN/network_weights.mat")
     sio.savemat("GANN/fitness.mat", mdict={"fitness": fitness_history})
